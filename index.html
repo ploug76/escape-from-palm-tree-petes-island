@@ -951,7 +951,10 @@ function titleText(cx,y,w,big){const s1='RESCUE FROM',s2="PALM TREE PETE'S",s3='
  txt(s1,cx,y+z1*.6,z1,'#fff','center',{f:TFONT,stroke:5,sc:'#1a0a2a'});
  const gr=g.createLinearGradient(0,y+z1,0,y+z1+z2*2.2);gr.addColorStop(0,'#fff6b0');gr.addColorStop(.5,'#ffc23a');gr.addColorStop(1,'#e8582a');
  for(const [s,z,yy] of [[s2,z2,y+z1*1.3+z2*.55],[s3,z3,y+z1*1.3+z2*1.15+z3*.55]]){g.font='bold '+z+'px '+TFONT;g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';g.lineWidth=Math.max(5,z*.16);g.strokeStyle='#2a0818';g.strokeText(s,cx,yy);g.fillStyle=gr;g.fillText(s,cx,yy)}
- const iy=y+z1*1.3+z2*1.15+z3*.55;const bw=Math.min(w*.86,z3*5.6);return saveBanner(cx,iy+z3*.24+bw*.0835,bw)}
+ const iy=y+z1*1.3+z2*1.15+z3*.55;const bw=Math.min(w*.86,z3*5.6),by=iy+z3*.24+bw*.0835,yE=saveBanner(cx,by,bw);
+ // keep-clear rects for the SAMPLE badge (title lines + banner), in CSS px
+ try{const K=[];for(const [s,z,yy] of [[s1,z1,y+z1*.6],[s2,z2,y+z1*1.3+z2*.55],[s3,z3,iy]]){g.font='bold '+z+'px '+TFONT;const mw=g.measureText(s).width+z*.3;K.push([cx-mw/2,yy-z*.6,mw,z*1.2,'title'])}K.push([cx-bw*.55,by-bw*.2,bw*1.1,Math.max(bw*.4,yE-by+bw*.1),'logo']);window.__keepClear=K}catch(e){}
+ return yE}
 // "SAVE THE CHILDREN": torn charred strip, fire glowing through the rips + letters, tilted across the bottom of ISLAND
 function saveBanner(cx,cy,bw){const im=IMG.banner,t=performance.now()/1000,A=-0.17;if(!im||!im.complete||!im.naturalWidth)return cy+bw*.2;
  const bh=bw*im.naturalHeight/im.naturalWidth,fl=.5+.25*Math.sin(t*9.3)+.15*Math.sin(t*23.7+1)+.1*Math.sin(t*4.1);
