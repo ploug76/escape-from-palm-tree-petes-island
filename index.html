@@ -93,11 +93,12 @@ const KIND={
  kid3:{h:16,w:.9,skin:'#c68b62',skinD:'#94603e',hair:'#2d1a10',hairD:'#160c06',shirt:'#5aa7e8',shirtD:'#3a7dc0',pants:'#d2a24a',shoe:'#333',kid:1,pony:1},
 };
 function limb(x1,y1,x2,y2,w,col){g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke()}
-function leg2(hx,hy,a1,a2,L,w,col,shoe,K){const kx=hx+Math.sin(a1)*L,ky=hy+Math.cos(a1)*L,fx=kx+Math.sin(a1+a2)*L,fy=ky+Math.cos(a1+a2)*L;
+function leg2(hx,hy,a1,a2,L,w,col,shoe,K){// limb angles: 0 = straight down, NEGATIVE = toward the facing side (+x). Knees bend with +a2 (shin swings back).
+ const kx=hx-Math.sin(a1)*L,ky=hy+Math.cos(a1)*L,fx=kx-Math.sin(a1+a2)*L,fy=ky+Math.cos(a1+a2)*L;
  limb(hx,hy,kx,ky,w,col);limb(kx,ky,fx,fy,w*.9,col);
  if(K.pants==='stars'){g.fillStyle='#fff';for(let i=1;i<4;i++){const t=i/4;star(LERP(hx,kx,t)+.6,LERP(hy,ky,t),.55);star(LERP(kx,fx,t)-.5,LERP(ky,fy,t),.5)}}
  // shoe
- g.save();g.translate(fx,fy);g.rotate(a1+a2>1.2?-(a1+a2)+1.2:0);
+ g.save();g.translate(fx,fy);{const sa=a1+a2;g.rotate(sa>1.2?sa-1.2:sa<-1.2?sa+1.2:0)}
  if(shoe==='flag'){rrW(-1.6,-1.6,5.4,2.6,1,'#c8202f');g.fillStyle='#1f2f6b';g.fillRect(-1.6,-1.6,2,1.3);g.fillStyle='#fff';g.fillRect(-1.6,.6,5.4,.6);g.fillRect(.6,-.9,3,.4)}
  else rrW(-1.6,-1.6,5.2,2.6,1,shoe);g.restore();return[fx,fy]}
 function rrW(x,y,w,h,r,f){rrPath(x,y,w,h,r);g.fillStyle=f;g.fill()}
@@ -162,7 +163,8 @@ function drawMan(kind,x,y,s,face,pose,ph,o){o=o||{};const K=KIND[kind];const h=K
  g.restore()}
 function shade(c){if(c[0]!=='#'||c.length<7)return c;const n=parseInt(c.slice(1),16);const r=(n>>16)*.72|0,gg=((n>>8)&255)*.72|0,b=(n&255)*.72|0;return'rgb('+r+','+gg+','+b+')'}
 function arm(K,x,y,a,e,h,back,face,pose,o){const L=h*.17,sl=K.shirt==='flag'?(back?'#b51f2d':'#f4efe6'):K.shirt==='hawaii'?'#f07a1e':K.shirt==='track'?'#1e2c5c':K.shirt;
- const ex=x+Math.sin(a)*L,ey=y+Math.cos(a)*L,hx=ex+Math.sin(a+e)*L,hy=ey+Math.cos(a+e)*L;
+ // same convention as leg2: negative a = arm forward; negative e = elbow bends forward (never backward)
+ const ex=x-Math.sin(a)*L,ey=y+Math.cos(a)*L,hx=ex-Math.sin(a+e)*L,hy=ey+Math.cos(a+e)*L;
  limb(x,y,ex,ey,2.8*K.w*(K.kid?.8:1),back?shade(sl):sl);
  if(K.shirt==='flag'&&!back){g.strokeStyle='#c22433';g.lineWidth=.9;g.beginPath();g.moveTo(LERP(x,ex,.35),LERP(y,ey,.35)-.9);g.lineTo(LERP(x,ex,.35),LERP(y,ey,.35)+.9);g.stroke()}
  // rolled sleeve cuff
@@ -171,7 +173,7 @@ function arm(K,x,y,a,e,h,back,face,pose,o){const L=h*.17,sl=K.shirt==='flag'?(ba
  if(K.watch&&!back){g.fillStyle='#e2b448';g.beginPath();g.arc(LERP(ex,hx,.78),LERP(ey,hy,.78),1.25,0,TAU);g.fill();g.fillStyle='#fff6d0';g.beginPath();g.arc(LERP(ex,hx,.78),LERP(ey,hy,.78),.55,0,TAU);g.fill()}
  g.fillStyle=back?K.skinD:K.skin;g.beginPath();g.arc(hx,hy,1.45*(K.kid?.8:1),0,TAU);g.fill();
  if(pose==='thumbs'&&!back){g.fillStyle=K.skin;g.fillRect(hx-.5,hy-3.2,1.2,2.6)}
- if(K.light&&!back&&!(o&&o.noLight)){g.save();g.translate(hx,hy);g.rotate(a+e-PI/2);g.fillStyle='#3b3b40';g.fillRect(-.6,-.8,4.2,1.6);g.fillStyle='#ffe9a0';g.fillRect(3.4,-1,1,2);g.restore()}}
+ if(K.light&&!back&&!(o&&o.noLight)){g.save();g.translate(hx,hy);g.rotate(a+e);g.fillStyle='#3b3b40';g.fillRect(-.6,-.8,4.2,1.6);g.fillStyle='#ffe9a0';g.fillRect(3.4,-1,1,2);g.restore()}}
 function head(K,kind,x,y,r,pose,ph,o){
  // neck
  g.fillStyle=K.skinD;g.fillRect(x-1.2,y+r*.6,2.4,2);
@@ -894,7 +896,7 @@ function drawFight(F){const FT=G.fight,H=FT.H,t=G.t;const ws=Math.min(F.w/AW,F.h
  for(const e of FT.en){const [sx,sy]=W2S(e.x,e.y);let pose=e.st==='down'?(e.run?'walk':'ko'):e.st==='windup'?'windup':e.st==='strike'||e.st==='lunge'?'punch':e.st==='block'?'block':e.st==='stun'?'hurt':e.st==='approach'||e.st==='back'?'walk':'idle';
   const face=e.run?1:e.face;drawMan(e.kind,sx,sy,ws,face,pose,e.ph,{flash:e.flash,dizzy:e.st==='down'&&!e.run,noLight:1});
   if(e.st==='windup'&&!e.toss){txt('!',sx,sy-34*ws,22,'#ff3b3b','center',{f:TFONT,stroke:4})}}
- const hp=H.atk?(H.atk.k==='punch'?'punch':H.atk.k==='low'?'lowkick':'kick'):!H.ground?'jump':H.crouch?'crouch':H.flash>.4?'hurt':Math.abs(H.vx)>1?'walk':'idle';
+ const hp=H.atk?(H.atk.k==='punch'?(H.atk.t<.07?'windup':'punch'):H.atk.k==='low'?'lowkick':'kick'):!H.ground?'jump':H.crouch?'crouch':H.flash>.4?'hurt':Math.abs(H.vx)>1?'walk':'idle';
  const [hx,hy]=W2S(H.x,H.y);drawMan('hero',hx,hy,ws,H.face,hp,H.ph,{flash:H.flash});
  drawPops(W2S,ws);
  // health bars
