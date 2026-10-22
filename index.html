@@ -965,7 +965,7 @@ function drawTitle(){const L=LY,P=L.portrait;coverImg(P?IMG.tall:IMG.wide,0,0,VW
   txt('A 589 Studios original  ·  Best '+totalBest(),cx,y+10,16,'#e8e2ff','center',{stroke:3});studioBtn('studio',cx,y+26,bw)}
  else{const bw=Math.min(200,(L.aw-60)/3);const y=L.B-66,x0=cx-(bw*3+24)/2;button('play',x0,y,bw,52,'▶ PLAY','#d1302f',()=>{sel=nextLevel();go('intro')},{sz:20});button('levels',x0+bw+12,y,bw,52,'LEVELS','#2a5cc8',()=>go('levels'));button('how',x0+2*bw+24,y,bw,52,'HOW TO PLAY','#3a7a3a',()=>{howPage=0;prevPlay=false;go('how')},{sz:17});txt('A 589 Studios original  ·  Best '+totalBest(),cx,y-16,16,'#e8e2ff','center',{stroke:3});studioBtn('studio',cx,y-80,Math.min(340,L.aw-40))}
  button('tmute',L.R-56,L.T+6,48,44,muted?'🔇':'🔊','rgba(20,20,40,.75)',()=>setMute(!muted),{sz:18})}
-const STUDIO_URL='https://ploug76.github.io/589-studios/#order';function studioBtn(id,cx,y,w){button(id,cx-w/2,y,w,46,'🎁 Order a Custom Game · 589 Studios','#e0439a',()=>{try{window.open(STUDIO_URL,'_blank','noopener')}catch(e){location.href=STUDIO_URL}},{sz:16})}
+const STUDIO_URL='https://589studios.github.io/589-studios/#order';function studioBtn(id,cx,y,w){button(id,cx-w/2,y,w,46,'🎁 Order a Custom Game · 589 Studios','#e0439a',()=>{try{window.open(STUDIO_URL,'_blank','noopener')}catch(e){location.href=STUDIO_URL}},{sz:16})}
 function nextLevel(){for(let i=0;i<LEVELS.length;i++)if(!save.done[i])return i;return 0}
 function unlocked(i){return i===0||!!save.done[i-1]}
 function dimBG(){coverImg(LY.portrait?IMG.tall:IMG.wide,0,0,VW,VH);g.fillStyle='rgba(8,6,24,.78)';g.fillRect(0,0,VW,VH)}
