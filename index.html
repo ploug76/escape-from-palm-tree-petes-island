@@ -1111,12 +1111,10 @@ if(/[?&]qa=1/.test(location.search))window.__QA=1;
 window.__ptp={get G(){return G},get state(){return state},get LY(){return LY},get held(){return held},newRun,enterSeg,go,restoreCP,finishLevel,startFight,setKeys(o){Object.assign(keys,o);recompute()},
  tp(x,y){if(G){G.H.x=x;G.H.y=y;CAM.init=0}},menu(){return menuBtns.map(b=>({id:b.id,x:b.x,y:b.y,w:b.w,h:b.h}))},save:()=>save};
 </script>
-<!--lb--><script>// Peter's Arcade leaderboard backend switch. Only PUBLIC keys go here.
-// Phase 1 (now): 'local' = scores stay on each phone. Switch to 'firestore' once the Firebase project exists.
+<!--lb--><script>// LIVE config (Firestore). Public web keys only (safe to ship per Firebase docs). Shared board for both copies of Rescue from Palm Tree Pete's Island (ploug76 + 589studios).
 window.PALB_CONFIG = {
-  backend: 'local',                 // 'local' | 'mock' | 'firestore' | 'supabase'
-  firestore: { projectId: '', apiKey: '' },   // from Firebase console > Project settings > Your apps > Web app config
-  supabase:  { url: '', key: '' }             // https://<ref>.supabase.co + sb_publishable_... key (NEVER sb_secret_ / service_role)
+  backend: 'firestore',
+  firestore: { projectId: 'peters-arcade-3ecb5', apiKey: 'AIzaSyDF1az3jKEZFcT7FP5j1FzjslDxMGL2VmE' }
 };
 </script><script>/* Peter's Arcade shared leaderboard (PALB) v1
    One drop-in file. Usage in a game:
@@ -1290,7 +1288,7 @@ async function postNow(){if(!G)return;const F=x=>x==null?()=>undefined:typeof x=
   return show()}
 const api={init,postNow,syncBest,localBest,gameOver,submitQuiet,watch,show,close,isOpen:()=>open,get backend(){return REMOTE?REMOTE.name:'local'},_t:{cleanName,nameError,fmt,boardId,pid,keyOf}};
 window.PALB=api})();
-</script><script>PALB.init({"game": "escape-from-palm-tree-petes-island", "title": "Rescue from Palm Tree Pete's Island", "overTitle": "MISSION COMPLETE!", "order": "desc", "unit": "pts", "min": 0, "max": 100000, "boards": null, "watch": [{"when": "(state==='result'||state==='victory')&&!!RES&&!window.__QA", "score": "totalBest()", "silent": true, "delay": 1200}]})</script><!--/lb--><!--share--><style>#dock{position:fixed;z-index:60;display:none;gap:6px;top:0;left:0}#dock.inl{position:static;display:flex;justify-content:center;flex-wrap:wrap;margin:6px auto}
+</script><script>PALB.init({"game": "escape-from-palm-tree-petes-island", "title": "Rescue from Palm Tree Pete's Island", "overTitle": "MISSION COMPLETE!", "order": "desc", "unit": "pts", "min": 0, "max": 20000, "boards": null, "watch": [{"when": "(state==='result'||state==='victory')&&!!RES&&!window.__QA", "score": "totalBest()", "silent": true, "delay": 1200}]})</script><!--/lb--><!--share--><style>#dock{position:fixed;z-index:60;display:none;gap:6px;top:0;left:0}#dock.inl{position:static;display:flex;justify-content:center;flex-wrap:wrap;margin:6px auto}
 .dk{box-sizing:border-box;height:34px;border-radius:17px;border:2px solid #fff;background:rgba(0,0,0,.66);color:#fff;font:bold 14px/30px system-ui,-apple-system,Segoe UI,sans-serif;padding:0 12px;margin:0;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;flex:none}
 .dk.ic{width:40px;padding:0;font-size:17px}#dock.inl .dk{height:44px;line-height:40px;font-size:17px;padding:0 18px;border-radius:22px;border-width:3px}
 #dockHint{position:fixed;z-index:61;display:none;box-sizing:border-box;background:rgba(10,10,20,.92);color:#fff;border:2px solid #fff;border-radius:12px;font:16px/1.3 system-ui,-apple-system,sans-serif;padding:8px 52px 8px 10px;top:0;left:0}#dockHint.inl{position:relative;margin:4px auto;max-width:320px}
