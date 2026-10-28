@@ -987,8 +987,11 @@ function drawTitle(){const L=LY,P=L.portrait;coverImg(P?IMG.tall:IMG.wide,0,0,VW
  const bg=g.createLinearGradient(0,VH*.62,0,VH);bg.addColorStop(0,'rgba(8,6,20,0)');bg.addColorStop(1,'rgba(8,6,20,.85)');g.fillStyle=bg;g.fillRect(0,VH*.62,VW,VH*.38);
  const cx=L.L+L.aw/2;let ty=P?L.T+64:L.T+10,big=P?60:50,vz=P?54:46,sY=L.B-146;
  // landscape: start the title below the Share/Install/Scores dock and shrink it so title + VS fit above the 589 button (Teddy QA 10/28)
- if(!P){try{const d=document.getElementById('dock');if(d&&getComputedStyle(d).display!=='none'){const r=d.getBoundingClientRect();if(r.height>0&&r.top<L.T+L.ah*.4)ty=Math.max(ty,r.bottom+6)}}catch(e){}
-  vz=Math.max(30,Math.min(46,(sY-ty)*.28));big=Math.max(22,Math.min(50,(sY-6-ty-vz*1.2)/TITLE_K))}
+ if(!P){let dR=null;try{const d=document.getElementById('dock');if(d&&getComputedStyle(d).display!=='none'){const r=d.getBoundingClientRect();if(r.height>0&&r.top<L.T+L.ah*.4)dR=r}}catch(e){}
+  vz=Math.max(30,Math.min(46,(sY-L.T-10)*.15));const tw=Math.min(L.aw*.6,620);big=22;
+  // biggest title that fits: the short RESCUE FROM line may sit beside the dock, PALM TREE PETE'S must start below it
+  for(let z=Math.min(50,tw/9.2);z>=22;z--){let y0=L.T+10;if(dR){const side=cx-z*1.4>dR.right+6;y0=side?Math.max(y0,dR.bottom+4-z*.6):Math.max(y0,dR.bottom+6)}
+   if(y0+TITLE_K*z+vz*1.2<=sY-6){big=z;ty=y0;break}ty=y0}}
  const yEnd=titleText(cx,ty,P?L.aw-24:Math.min(L.aw*.6,620),big);
  // VS flash between the two fighters
  const vsY=P?L.T+L.ah*.6:Math.min(Math.max(L.T+L.ah*.55,yEnd+vz*.6),sY-6-vz*.6),pul=1+.12*Math.sin(t*6),flash=(Math.sin(t*3)>.7);txt('VS',cx,vsY,vz*pul,flash?'#fff':'#ffe14a','center',{f:TFONT,stroke:7,sc:'#a0102a'});
