@@ -962,6 +962,7 @@ function button(id,x,y,w,h,label,col,fn,o){o=o||{};const dn=BTNDOWN===id;const d
  const sz=fitSize(label,o.sz||19,w-14);txt(label,x+w/2,y+h/2+(dn?3:1),sz,dis?'#bbb':'#fff','center',{stroke:2,sc:'rgba(0,0,0,.35)'});menuBtns.push({id,x,y,w,h,fn:dis?()=>{}:fn})}
 function go(s){state=s;BTNDOWN=null;resetInput();try{window.__dock&&__dock.tick()}catch(e){}}
 function coverImg(im,x,y,w,h,fy){if(!im||!im.complete||!im.naturalWidth){const gr=g.createLinearGradient(0,y,0,y+h);gr.addColorStop(0,'#3a2a6a');gr.addColorStop(1,'#f08a4a');g.fillStyle=gr;g.fillRect(x,y,w,h);return}const k=Math.max(w/im.naturalWidth,h/im.naturalHeight),dw=im.naturalWidth*k,dh=im.naturalHeight*k;g.drawImage(im,x+(w-dw)/2,y+(h-dh)*(fy==null?.5:fy),dw,dh)}
+let TITLE_K=3.2; // title block height / line-2 font size, measured each draw
 function titleText(cx,y,w,big){const s1='RESCUE FROM',s2="PALM TREE PETE'S",s3='ISLAND';const z2=Math.min(big,w/9.2),z1=z2*.5,z3=z2*1.12;
  txt(s1,cx,y+z1*.6,z1,'#fff','center',{f:TFONT,stroke:5,sc:'#1a0a2a'});
  const gr=g.createLinearGradient(0,y+z1,0,y+z1+z2*2.2);gr.addColorStop(0,'#fff6b0');gr.addColorStop(.5,'#ffc23a');gr.addColorStop(1,'#e8582a');
@@ -969,6 +970,7 @@ function titleText(cx,y,w,big){const s1='RESCUE FROM',s2="PALM TREE PETE'S",s3='
  const iy=y+z1*1.3+z2*1.15+z3*.55;const bw=Math.min(w*.86,z3*5.6),by=iy+z3*.24+bw*.0835,yE=saveBanner(cx,by,bw);
  // keep-clear rects for the SAMPLE badge (title lines + banner), in CSS px
  try{const K=[];for(const [s,z,yy] of [[s1,z1,y+z1*.6],[s2,z2,y+z1*1.3+z2*.55],[s3,z3,iy]]){g.font='bold '+z+'px '+TFONT;const mw=g.measureText(s).width+z*.3;K.push([cx-mw/2,yy-z*.6,mw,z*1.2,'title'])}K.push([cx-bw*.55,by-bw*.2,bw*1.1,Math.max(bw*.4,yE-by+bw*.1),'logo']);window.__keepClear=K}catch(e){}
+ if(IMG.banner&&IMG.banner.complete&&IMG.banner.naturalWidth&&z2>0)TITLE_K=(yE-y)/z2;
  return yE}
 // "SAVE THE CHILDREN": torn charred strip, fire glowing through the rips + letters, tilted across the bottom of ISLAND
 function saveBanner(cx,cy,bw){const im=IMG.banner,t=performance.now()/1000,A=-0.17;if(!im||!im.complete||!im.naturalWidth)return cy+bw*.2;
@@ -983,9 +985,13 @@ function saveBanner(cx,cy,bw){const im=IMG.banner,t=performance.now()/1000,A=-0.
 function drawTitle(){const L=LY,P=L.portrait;coverImg(P?IMG.tall:IMG.wide,0,0,VW,VH,P?.5:.35);const t=performance.now()/1000;
  const tg=g.createLinearGradient(0,0,0,VH*.35);tg.addColorStop(0,'rgba(10,6,30,.55)');tg.addColorStop(1,'rgba(10,6,30,0)');g.fillStyle=tg;g.fillRect(0,0,VW,VH*.35);
  const bg=g.createLinearGradient(0,VH*.62,0,VH);bg.addColorStop(0,'rgba(8,6,20,0)');bg.addColorStop(1,'rgba(8,6,20,.85)');g.fillStyle=bg;g.fillRect(0,VH*.62,VW,VH*.38);
- const cx=L.L+L.aw/2;let ty=P?L.T+64:L.T+10;const yEnd=titleText(cx,ty,P?L.aw-24:Math.min(L.aw*.6,620),P?60:50);
+ const cx=L.L+L.aw/2;let ty=P?L.T+64:L.T+10,big=P?60:50,vz=P?54:46,sY=L.B-146;
+ // landscape: start the title below the Share/Install/Scores dock and shrink it so title + VS fit above the 589 button (Teddy QA 10/28)
+ if(!P){try{const d=document.getElementById('dock');if(d&&getComputedStyle(d).display!=='none'){const r=d.getBoundingClientRect();if(r.height>0&&r.top<L.T+L.ah*.4)ty=Math.max(ty,r.bottom+6)}}catch(e){}
+  vz=Math.max(30,Math.min(46,(sY-ty)*.28));big=Math.max(22,Math.min(50,(sY-6-ty-vz*1.2)/TITLE_K))}
+ const yEnd=titleText(cx,ty,P?L.aw-24:Math.min(L.aw*.6,620),big);
  // VS flash between the two fighters
- const vsY=P?L.T+L.ah*.6:Math.max(L.T+L.ah*.55,yEnd+18),pul=1+.12*Math.sin(t*6),flash=(Math.sin(t*3)>.7);txt('VS',cx,vsY,(P?54:46)*pul,flash?'#fff':'#ffe14a','center',{f:TFONT,stroke:7,sc:'#a0102a'});
+ const vsY=P?L.T+L.ah*.6:Math.min(Math.max(L.T+L.ah*.55,yEnd+vz*.6),sY-6-vz*.6),pul=1+.12*Math.sin(t*6),flash=(Math.sin(t*3)>.7);txt('VS',cx,vsY,vz*pul,flash?'#fff':'#ffe14a','center',{f:TFONT,stroke:7,sc:'#a0102a'});
  if(P){const bw=Math.min(320,L.aw-40),bx=cx-bw/2;let y=L.B-208;button('play',bx,y,bw,58,save.done[0]?'▶  PLAY':'▶  START MISSION','#d1302f',()=>{sel=nextLevel();go('intro')},{sz:22});y+=70;
   const hw=(bw-12)/2;button('levels',bx,y,hw,50,'LEVELS','#2a5cc8',()=>go('levels'));button('how',bx+hw+12,y,hw,50,'HOW TO PLAY','#3a7a3a',()=>{howPage=0;prevPlay=false;go('how')},{sz:17});y+=62;
   txt('A 589 Studios original  ·  Best '+totalBest(),cx,y+10,16,'#e8e2ff','center',{stroke:3});studioBtn('studio',cx,y+26,bw)}
