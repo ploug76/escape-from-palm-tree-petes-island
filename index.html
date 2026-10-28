@@ -99,6 +99,8 @@ const KIND={
  kid1:{h:17,w:.9,skin:'#8d5a3c',skinD:'#643c26',hair:'#1a120c',hairD:'#0a0604',shirt:'#f2c230',shirtD:'#c4961a',pants:'#5a4a8a',shoe:'#e94b5a',kid:1,pony:1},
  kid2:{h:19,w:.9,skin:'#f3d0b0',skinD:'#c99d7b',hair:'#e8c46a',hairD:'#b8913a',shirt:'#3bb273',shirtD:'#258a52',pants:'#2b3a55',shoe:'#fff',kid:1},
  kid3:{h:16,w:.9,skin:'#c68b62',skinD:'#94603e',hair:'#2d1a10',hairD:'#160c06',shirt:'#5aa7e8',shirtD:'#3a7dc0',pants:'#d2a24a',shoe:'#333',kid:1,pony:1},
+ kid4:{h:17,w:.9,skin:'#f6d3b8',skinD:'#cf9f7f',hair:'#c8501e',hairD:'#8f3410',shirt:'#9b59d0',shirtD:'#7239a6',pants:'#2f6f5a',shoe:'#ffd84a',kid:1},
+ kid5:{h:18,w:.9,skin:'#6e4128',skinD:'#4a2a18',hair:'#151010',hairD:'#050303',shirt:'#ff8c2a',shirtD:'#cc6a14',pants:'#e8e2d0',shoe:'#3bb273',kid:1,pony:1},
 };
 function limb(x1,y1,x2,y2,w,col){g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke()}
 function leg2(hx,hy,a1,a2,L,w,col,shoe,K){// limb angles: 0 = straight down, NEGATIVE = toward the facing side (+x). Knees bend with +a2 (shin swings back).
@@ -584,8 +586,8 @@ function sideAfter(dt,ctx){const S=G.S,H=G.H;
   else if(k==='door'){const d=ctx.o;for(let y=0;y<S.h;y++)if(S.t[y][d.tx]==='D')S.t[y][d.tx]='d';G.flags.opened[G.segI+':'+d.tx]=1;SFX.door();S.canvas=renderSide(S)}
   else if(k==='locked'){if(G.keys>0){const d=ctx.o;for(let y=0;y<S.h;y++)if(S.t[y][d.tx]==='L')S.t[y][d.tx]='l';G.flags.opened[G.segI+':'+d.tx]=1;SFX.door();say('Unlocked with the keycard!',2,'#7CFC9A');S.canvas=renderSide(S)}else{say('Locked. Find the keycard first!',2.2,'#ffb44a');SFX.huh()}}
   else if(k==='cage'){const cg=ctx.o;if(S.def.keyHidden&&!G.keys){say("Locked! Palm Tree Pete has the key.",2.4,'#ffb44a');SFX.huh()}else{cg.open=1;G.flags.freed[cg.key]=1;SFX.cheer();vib(40);
-    if(S.def.keyHidden){for(let i=0;i<cg.n;i++){const kk='kid'+((G.kidsFollow.length)%4);G.kidsFollow.push(kk);G.kidsPos.push({x:cg.x+(i-cg.n/2)*8,y:cg.y,k:kk,ph:i,cheer:1.5})}say(cg.n>2?'You freed '+cg.n+' kids! Lead them out the back door!':'2 more kids freed! They follow you.',3,'#7CFC9A')}
-    else{G.kidsSaved+=cg.n;for(let i=0;i<cg.n;i++)G.runners.push({x:cg.x+i*8,y:cg.y,k:'kid'+(i+1),t:0,dir:-1});say(cg.n>1?'Kids freed! They sneak back to the boat.':'Kid freed! They sneak back to the boat.',2.8,'#7CFC9A')}}}}
+    if(S.def.keyHidden){for(let i=0;i<cg.n;i++){const kk='kid'+((i+(cg.n>2?0:4))%6);G.kidsFollow.push(kk);G.kidsPos.push({x:cg.x+(i-cg.n/2)*8,y:cg.y,k:kk,ph:i,cheer:1.5})}say(cg.n>2?'You freed '+cg.n+' kids! Lead them out the back door!':'2 more kids freed! They follow you.',3,'#7CFC9A')}
+    else{G.kidsSaved+=cg.n;for(let i=0;i<cg.n;i++)G.runners.push({x:cg.x+i*8,y:cg.y,k:'kid'+((i+4)%6),t:0,dir:-1});say(cg.n>1?'Kids freed! They sneak back to the boat.':'Kid freed! They sneak back to the boat.',2.8,'#7CFC9A')}}}}
  // keys / checkpoints / exits
  for(const k of S.keys){if(!k.got&&!(S.def.keyHidden&&!G.flags.boss)&&Math.abs(H.x-k.x)<10&&Math.abs(H.y-6-k.y)<16){k.got=1;G.keys++;G.flags.taken[k.key]=1;SFX.key();pop(S.def.keyHidden?'KEY RING!':'KEYCARD!',k.x,k.y-10,'#ffe14a');say(S.def.keyHidden?'Got the key ring! Free the kids (B at a cage).':'Got the keycard! Now unlock the exit door.',2.6,'#7CFC9A')}}
  for(const f of S.flagsF)if(!G.flags.taken['F'+G.segI+f.key]&&Math.abs(H.x-f.x)<10&&Math.abs(H.y-f.y)<12){G.flags.taken['F'+G.segI+f.key]=1;setCP(f.x,f.y);say('Checkpoint!',1.6,'#7CFC9A');SFX.key()}
@@ -874,7 +876,7 @@ function drawSideView(F){const S=G.S,H=G.H,t=G.t;const ws=Math.min(F.w/(8.5*T),F
  for(const k of S.keys){if(k.got||(S.def.keyHidden&&!G.flags.boss))continue;const [sx,sy]=W2S(k.x,k.y+Math.sin(t*3)*2);if(S.def.keyHidden){g.strokeStyle='#ffd84a';g.lineWidth=3;g.beginPath();g.arc(sx,sy,7,0,TAU);g.stroke();g.fillStyle='#ffd84a';g.fillRect(sx+5,sy-2,12,4);g.fillRect(sx+13,sy+2,3,5)}else{rr(sx-9,sy-6,18,12,2,'#e8eef8','#2a6fd1',2);g.fillStyle='#2a6fd1';g.fillRect(sx-9,sy-2,18,3)}
   g.globalCompositeOperation='lighter';g.fillStyle='rgba(255,230,120,.25)';g.beginPath();g.arc(sx,sy,14+3*Math.sin(t*5),0,TAU);g.fill();g.globalCompositeOperation='source-over'}
  // cages + kids inside
- for(const cg of S.cages){const [sx,sy]=W2S(cg.x,cg.y);const w=s*1.7,h=s*1.9;if(!cg.open){for(let i=0;i<cg.n;i++){const kx=sx-w*.32+i*(w*.64/Math.max(1,cg.n-1||1));drawMan('kid'+((i+(cg.n>2?0:1))%4),cg.n===1?sx:kx,sy,ws*.95,i%2?-1:1,'scared',t+i,{})}}
+ for(const cg of S.cages){const [sx,sy]=W2S(cg.x,cg.y);const w=s*1.7,h=s*1.9;if(!cg.open){for(let i=0;i<cg.n;i++){const kx=sx-w*.32+i*(w*.64/Math.max(1,cg.n-1||1));drawMan('kid'+((i+(cg.n>2?0:4))%6),cg.n===1?sx:kx,sy,ws*.95,i%2?-1:1,'scared',t+i,{})}}
   g.strokeStyle=cg.open?'rgba(180,180,190,.5)':'#9aa0a8';g.lineWidth=3;g.strokeRect(sx-w/2,sy-h,w,h);for(let i=1;i<7;i++){if(cg.open&&i>3)continue;const xx=sx-w/2+i*w/7;g.beginPath();g.moveTo(xx,sy-h);g.lineTo(xx,sy);g.stroke()}g.fillStyle='#6a6f78';g.fillRect(sx-w/2,sy-h,w,4);if(!cg.open){g.fillStyle='#d4a640';g.fillRect(sx+w/2-8,sy-h*.5,7,9)}}
  // cameras
  for(const cm of S.cams){const [sx,sy]=W2S(cm.x,cm.y);const a=cm.a==null?PI/2:cm.a;if(cm.off<=0){fillPoly(conePoly(S,cm.x,cm.y+2,a,104,.3,(x,y)=>sSolid(sT(S,Math.floor(x/T),Math.floor(y/T)))),W2S,cm.susp>.5?'rgba(255,60,60,.25)':'rgba(255,90,90,.13)')}
@@ -887,7 +889,7 @@ function drawSideView(F){const S=G.S,H=G.H,t=G.t;const ws=Math.min(F.w/(8.5*T),F
  for(const r of G.runners){const [sx,sy]=W2S(r.x,r.y);g.globalAlpha=Math.max(0,1-r.t/4);drawMan(r.k,sx,sy,ws*.95,r.dir,'walk',r.ph*1.3);g.globalAlpha=1}
  G.kidsPos.forEach((k,i)=>{const [sx,sy]=W2S(k.x,k.y);drawMan(k.k,sx,sy,ws*.95,k.face||1,k.cheer>0?'cheer':k.moving?'walk':'idle',k.ph)});
  // jump cue (villa): stairs top '/' with a ledge '=' to its left -> '◀ JUMP' hint near the hero
- for(let y=0;y<S.h;y++)for(let x=1;x<S.w;x++)if(S.t[y][x]==='/'&&S.t[y][x-1]==='='&&Math.abs(H.x-(x+.5)*T)<T*4&&Math.abs(H.y-y*T)<T*3){const tt=performance.now()/1000,[ax,ay]=W2S((x-.7)*T,(y-1.1)*T);g.save();g.font='bold '+Math.round(Math.max(18,7*ws))+'px sans-serif';g.textAlign='center';g.textBaseline='middle';g.lineWidth=4;g.strokeStyle='rgba(0,0,0,.85)';g.fillStyle='#ffe14a';g.globalAlpha=.8+.2*Math.sin(tt*7);const bx2=ax-Math.abs(Math.sin(tt*4))*6;g.strokeText('◀ JUMP',bx2,ay);g.fillText('◀ JUMP',bx2,ay);g.restore()}
+ for(let y=0;y<S.h;y++)for(let x=1;x<S.w;x++)if(S.t[y][x]==='/'&&S.t[y][x-1]==='='&&Math.abs(H.x-(x+.5)*T)<T*4&&Math.abs(H.y-y*T)<T*3){const tt=performance.now()/1000,[ax,ay]=W2S((x-.7)*T,(y-2.35)*T);/* above the wardrobe */g.save();g.font='bold '+Math.round(Math.max(18,7*ws))+'px sans-serif';g.textAlign='center';g.textBaseline='middle';g.lineWidth=4;g.strokeStyle='rgba(0,0,0,.85)';g.fillStyle='#ffe14a';g.globalAlpha=.8+.2*Math.sin(tt*7);const bx2=ax-Math.abs(Math.sin(tt*4))*6;g.strokeText('◀ JUMP',bx2,ay);g.fillText('◀ JUMP',bx2,ay);g.restore()}
  // hero
  const [hx,hy]=W2S(H.x,H.y);const hid=sideHidden(S,H);let pose=H.climb?'climb':!H.ground?'jump':H.crouch?'crouch':H.moving?'walk':'idle';g.globalAlpha=hid?.6:1;drawMan('hero',hx,hy,ws,H.face,pose,H.climb?(H.moving?H.ph:0):H.ph);g.globalAlpha=1;
  // front objects (hide spots)
@@ -1023,7 +1025,7 @@ function drawVictory(){const L=LY,t=performance.now()/1000;VIC_T+=1/60;const gr=
  const R=srand(Math.floor(t/1.4));for(let k=0;k<2;k++){const fx=VW*(.15+R()*.7),fy=VH*(.1+R()*.25),ph=(t%1.4)/1.4,cols=['#ff5a6a','#fff','#5aa0ff','#ffd84a'];for(let i=0;i<16;i++){const a=i*TAU/16;g.fillStyle=cols[(i+k)%4];g.globalAlpha=1-ph;g.beginPath();g.arc(fx+Math.cos(a)*ph*70,fy+Math.sin(a)*ph*70+ph*ph*20,3,0,TAU);g.fill()}g.globalAlpha=1}
  // boat with the hero and the cheering kids
  let s=Math.min(VW/150,VH/170)*1.25;s=Math.min(s,(L.aw-16)/124);const bx=Math.max(L.L+s*62+8,Math.min(L.R-s*62-8,VW*.42)),by=Math.min(hz+VH*.16,L.B-(L.portrait?132:72)-s*9)+Math.sin(t*1.5)*3;g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(bx,by+6,s*60,s*8,0,0,TAU);g.fill();
- for(let i=0;i<6;i++)drawMan('kid'+(i%4),bx-s*46+i*s*14,by-s*4,s*.92,i%2?-1:1,'cheer',t*1.2+i,{noShadow:1});
+ for(let i=0;i<6;i++)drawMan('kid'+i,bx-s*46+i*s*14,by-s*4,s*.92,i%2?-1:1,'cheer',t*1.2+i,{noShadow:1});
  drawMan('hero',bx+s*42,by-s*4,s*1.15,-1,'thumbs',t,{noShadow:1});
  g.fillStyle='#2b2d33';rrPath(bx-s*58,by-s*6,s*116,s*14,s*7);g.fill();g.fillStyle='#c8202f';g.fillRect(bx-s*50,by-s*2,s*100,s*3);g.fillStyle='#fff';g.fillRect(bx-s*50,by+s*1,s*100,s*2);
  const cx=L.L+L.aw/2;txt('THE KIDS ARE FREE!',cx,L.T+46,fitSize('THE KIDS ARE FREE!',40,L.aw-20,TFONT),'#ffe14a','center',{f:TFONT,stroke:6,sc:'#4a0818'});txt('Stars & Stripes saves the day!',cx,L.T+86,18,'#fff','center',{stroke:3});
