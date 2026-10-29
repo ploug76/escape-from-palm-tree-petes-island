@@ -941,10 +941,7 @@ const CTXL={take:['✊','TAKEDOWN'],fight:['✊','ATTACK'],grab:['✋','GRAB'],t
 function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
  for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
  if(L.portrait){const pn=L.panel[0],x0=P.cx+1.5*a+10,x1=pn.x+pn.w-12;const s="PETE'S ISLAND";txt(s,(x0+x1)/2,pn.y+24,fitSize(s,16,x1-x0),'#ff6a5a','center',{f:'"Courier New",monospace'})}
- g.save();g.shadowColor='rgba(0,0,0,.5)';g.shadowOffsetY=4;padPath(cx,cy,a,a);g.fillStyle='#111015';g.fill();g.restore();
- const lit={l:held.l,r:held.r,u:held.u,d:held.d};const arm={l:[cx-a,cy],r:[cx+a,cy],u:[cx,cy-a],d:[cx,cy+a]},ang={l:PI,r:0,u:-PI/2,d:PI/2};
- for(const k of ['l','r','u','d']){const [x,y]=arm[k];if(lit[k])rr(x-a/2+3,y-a/2+3,a-6,a-6,8,'rgba(255,216,74,.85)',null);tri(x+(k==='l'?-a*.08:k==='r'?a*.08:0),y+(k==='u'?-a*.08:k==='d'?a*.08:0),a*.22,ang[k],lit[k]?'#1b1440':'#8f8c99')}
- g.beginPath();g.arc(cx,cy,a*.22,0,TAU);g.fillStyle='#1d1b22';g.fill();g.strokeStyle='#3a3742';g.lineWidth=2;g.stroke();
+ {const sw=a*3-8,l1='SWIPE ANYWHERE',l2='TO MOVE';txt(l1,cx,cy-12,fitSize(l1,16,sw),'#8f8c99','center',{f:'"Courier New",monospace'});txt(l2,cx,cy+12,fitSize(l2,16,sw),'#8f8c99','center',{f:'"Courier New",monospace'})}
  const ctx=state==='play'&&G&&G.mode!=='fight'?G.ctx:null;const side=G&&(G.mode==='side'||G.mode==='fight');
  for(const k of ['b','a']){const q=L.ab[k],on=held[k];const dy=on?2:0;g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
   g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);g.fillStyle=on?'#ff6a5a':'#d1302f';g.fill();g.lineWidth=3;g.strokeStyle=on?'#ffd84a':'#7c1515';g.stroke();
@@ -1016,7 +1013,7 @@ const TAUNT=["My goons never sleep! …Well, hardly ever.","Stay out of my villa
 function drawIntro(){dimBG();const L=LY,cx=L.L+L.aw/2,lv=LEVELS[sel];const w=Math.min(420,L.aw-20);const x=cx-w/2;let y=L.T+14;
  txt('LEVEL '+(sel+1),cx,y+18,20,'#ffb44a','center',{f:TFONT,stroke:3});txt(lv.name.toUpperCase(),cx,y+50,fitSize(lv.name.toUpperCase(),32,w-20,TFONT),'#ffe14a','center',{f:TFONT,stroke:5});y+=78;
  const lines=wrap(lv.intro.join('\n'),w-28,17);const bh=lines.length*23+18;rr(x,y,w,bh,12,'rgba(20,24,60,.9)','#fff',2);lines.forEach((l,i)=>txt(l,x+14,y+20+i*23,17,'#fff','left'));y+=bh+12;
- const ctl=wrap('D-pad: move.  A: jump / hop a hedge.  B (ACTION): takedown, open, climb, grab, throw, free kids.  Hide in bushes, or hold ▼ behind furniture.',w-20,16);
+ const ctl=wrap('Swipe anywhere to move (hold to keep going).  A: jump / hop a hedge.  B (ACTION): takedown, open, climb, grab, throw, free kids.  Hide in bushes, or swipe down and hold behind furniture.',w-20,16);
  if(L.portrait||L.ah>420){ctl.forEach((l,i)=>txt(l,cx,y+10+i*21,16,'#cfe3ff','center'));y+=ctl.length*21+14}
  // taunt from the (original, cartoon) villain shown in the cover art behind
  const tw=Math.min(w*.62,250);const tl=wrap('“'+TAUNT[sel]+'”',tw-20,16);const tb=tl.length*20+14;if(L.B-80-y>tb+30){const tx=x+w-tw-4;rr(tx,y+4,tw,tb,10,'#fff8e8','#c8424f',2);tl.forEach((l,i)=>txt(l,tx+10,y+18+i*20,16,'#5a1a10','left'));txt('— Palm Tree Pete',tx+tw-8,y+tb+20,16,'#ffb44a','right',{stroke:3})}
@@ -1052,9 +1049,9 @@ function drawVictory(){const L=LY,t=performance.now()/1000;VIC_T+=1/60;const gr=
  txt('Every kid is safe and headed home.',cx,L.T+112,16,'#fff','center',{stroke:3});
  if(L.portrait){studioBtn('vstudio',cx,L.B-120,Math.min(340,L.aw-24));button('vres',cx-110,L.B-64,220,54,'SEE RESULTS ▶','#2fae4a',()=>go('result'),{sz:20})}else{const sw=Math.min(340,L.aw-260),tw=sw+12+220,x0=cx-tw/2;studioBtn('vstudio',x0+sw/2,L.B-60,sw);button('vres',x0+sw+12,L.B-64,220,54,'SEE RESULTS ▶','#2fae4a',()=>go('result'),{sz:20})}}
 const HOW=[['The mission',"Palm Tree Pete, a crooked island boss, is holding kids on his island. You are Stars & Stripes. Sneak in, free every kid and get them all back to the boat.\n\nOutdoors you sneak from above. Indoors the view turns sideways, like a classic platformer."],
- ['Controls',"D-pad: move (slide your thumb to change direction).\nA: jump. Outdoors it hops over low hedges.\nB is ACTION, and the label above it tells you what it will do: TAKEDOWN, ATTACK, OPEN a door, CLIMB a ladder, GRAB or THROW a coconut, UNLOCK, FREE KIDS.\nKeyboard: arrows/WASD, Space or Z = A, X or J = B, P = pause."],
- ['Stay hidden',"Thugs light the ground with flashlights. If one sees you, a ? appears and his meter fills. At ! you're spotted.\nStand still in a bush to vanish. Indoors, hold ▼ behind furniture to hide.\nThrow a coconut to make guards walk over and look.\nSneak up from behind and press B for a quiet takedown: they get dizzy and sit down."],
- ['Fights',"Get spotted (or bump into a thug) and it's a VS fight!\nB: punch.  ▼+B: low kick, which breaks a block.  A then B: jump kick.\nHold ▼ to duck high punches. Watch for the red ! before they swing.\nWin to go back to sneaking. Lose all your health and you're CAUGHT: back to the last checkpoint."],
+ ['Controls',"Swipe anywhere to move. Keep your finger down to keep moving, slide it to change direction, lift it to stop.\nA: jump. Outdoors it hops over low hedges.\nB is ACTION, and the label above it tells you what it will do: TAKEDOWN, ATTACK, OPEN a door, CLIMB a ladder, GRAB or THROW a coconut, UNLOCK, FREE KIDS.\nKeyboard: arrows/WASD, Space or Z = A, X or J = B, P = pause."],
+ ['Stay hidden',"Thugs light the ground with flashlights. If one sees you, a ? appears and his meter fills. At ! you're spotted.\nStand still in a bush to vanish. Indoors, swipe down and hold behind furniture to hide (or hold ▼ on a keyboard).\nThrow a coconut to make guards walk over and look.\nSneak up from behind and press B for a quiet takedown: they get dizzy and sit down."],
+ ['Fights',"Get spotted (or bump into a thug) and it's a VS fight!\nB: punch.  Down+B: low kick, which breaks a block.  A then B: jump kick.\nSwipe down and hold to duck high punches. Watch for the red ! before they swing.\nWin to go back to sneaking. Lose all your health and you're CAUGHT: back to the last checkpoint."],
  ['Stars',"Each level gives 3 stars:\n⏱ finish under the time,\n👀 never get spotted,\n🧒 rescue every kid.\nSneaking past unseen earns more than fighting: GHOST beats SHADOW beats BRAWLER."]];
 function drawHow(){dimBG();const L=LY,cx=L.L+L.aw/2,p=HOW[howPage];const w=Math.min(440,L.aw-20),x=cx-w/2;txt('HOW TO PLAY  '+(howPage+1)+'/'+HOW.length,cx,L.T+30,20,'#ffb44a','center',{f:TFONT});txt(p[0],cx,L.T+64,28,'#ffe14a','center',{f:TFONT,stroke:4});
  const lines=wrap(p[1],w-28,17);const h=Math.min(L.B-170-(L.T+88),lines.length*23+20);rr(x,L.T+88,w,h+4,12,'rgba(20,24,60,.92)','#fff',2);lines.forEach((l,i)=>{const yy=L.T+108+i*23;if(yy<L.T+88+h)txt(l,x+14,yy,17,'#fff','left')});
@@ -1062,11 +1059,11 @@ function drawHow(){dimBG();const L=LY,cx=L.L+L.aw/2,p=HOW[howPage];const w=Math.
  button('hdone',cx-bw/2,by,bw,54,'DONE','#2fae4a',()=>{const back=!!(G&&prevPlay);prevPlay=false;go(back?'pause':'title')});button('hnext',cx+bw/2+12,by,bw,54,'NEXT ▶','#2a5cc8',()=>{howPage=Math.min(HOW.length-1,howPage+1)},{dis:howPage===HOW.length-1})}
 let prevPlay=false;
 
-// ===== input: NES-style pad (D-pad + B/A, multi-touch, slide-to-change), keyboard =====
+// ===== input: swipe-anywhere movement (hold to keep moving, release to stop) + B/A buttons, multi-touch, keyboard =====
 let keys={l:0,r:0,u:0,d:0,a:0,b:0},ptrs=new Map();
 const inR=(b,x,y,p=0)=>x>=b.x-p&&x<=b.x+b.w+p&&y>=b.y-p&&y<=b.y+b.h+p;
 function padDirs(x,y){const P=LY.pad,dx=x-P.cx,dy=y-P.cy,ax=Math.abs(dx),ay=Math.abs(dy),o=[];if(Math.hypot(dx,dy)<P.a*.3)return o;const Tn=2.414;if(ax>ay/Tn)o.push(dx>0?'r':'l');if(ay>ax/Tn)o.push(dy>0?'d':'u');return o}
-function onPad(x,y){const P=LY.pad,h=P.a*1.5+14;return Math.abs(x-P.cx)<=h&&Math.abs(y-P.cy)<=h}
+function swDirs(q,x,y){const dx=x-q.sx,dy=y-q.sy,d=Math.hypot(dx,dy),M=56;if(d>M){q.sx=x-dx*M/d;q.sy=y-dy*M/d}if(d<16)return q.pad;const ax=Math.abs(dx),ay=Math.abs(dy),o=[],Tn=2.414;if(ax>ay/Tn)o.push(dx>0?'r':'l');if(ay>ax/Tn)o.push(dy>0?'d':'u');return o}
 function abAt(x,y,pad=12){const o=[];for(const k of ['b','a']){const q=LY.ab[k];if(Math.hypot(x-q.cx,y-q.cy)<=q.r+pad)o.push(k)}return o}
 function inPanel(x,y){return LY.panel.some(p=>inR(p,x,y,0))}
 function recompute(){const h={l:0,r:0,u:0,d:0,a:0,b:0};for(const q of ptrs.values()){if(q.pad)for(const k of q.pad)h[k]=1;if(q.ab)for(const k of q.ab)h[k]=1}
@@ -1075,12 +1072,11 @@ function resetInput(){ptrs.clear();keys={l:0,r:0,u:0,d:0,a:0,b:0};recompute();BT
 c.addEventListener('pointerdown',e=>{e.preventDefault();A();const x=e.clientX,y=e.clientY;
  if(state==='play'){const hb=menuBtns.find(b=>inR(b,x,y,4));if(hb){BTNDOWN=hb.id;ptrs.set(e.pointerId,{btn:hb});return}
   try{c.setPointerCapture(e.pointerId)}catch(_){}
-  if(onPad(x,y)){ptrs.set(e.pointerId,{pad:padDirs(x,y)});recompute();return}
   const ab=abAt(x,y);if(ab.length){ptrs.set(e.pointerId,{ab});recompute();return}
-  ptrs.set(e.pointerId,{dead:1});return}
+  ptrs.set(e.pointerId,{pad:[],sx:x,sy:y});return}
  const b=[...menuBtns].reverse().find(b=>inR(b,x,y,4));if(b){BTNDOWN=b.id;ptrs.set(e.pointerId,{btn:b})}},{passive:false});
 c.addEventListener('pointermove',e=>{const q=ptrs.get(e.pointerId);if(!q||q.dead||q.btn)return;const x=e.clientX,y=e.clientY;
- if(q.pad){const d=padDirs(x,y);if(d.join()!==q.pad.join()){q.pad=d;recompute()}return}
+ if(q.pad){const d=swDirs(q,x,y);if(d.join()!==q.pad.join()){q.pad=d;recompute()}return}
  if(q.ab){const b=abAt(x,y,16);if(b.length&&b.join()!==q.ab.join()){q.ab=b;recompute()}}});
 function ptrEnd(e){const q=ptrs.get(e.pointerId);ptrs.delete(e.pointerId);if(q&&q.btn){if(e.type==='pointerup'){const x=e.clientX,y=e.clientY;const b=menuBtns.find(b=>b.id===q.btn.id);if(b&&inR(b,x,y,10)){SFX.click();b.fn()}}BTNDOWN=null}recompute()}
 c.addEventListener('pointerup',ptrEnd);c.addEventListener('pointercancel',e=>{ptrEnd(e);resetInput()});c.addEventListener('lostpointercapture',e=>{if(ptrs.has(e.pointerId)){ptrs.delete(e.pointerId);recompute()}});
