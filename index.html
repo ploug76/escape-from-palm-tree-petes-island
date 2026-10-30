@@ -65,15 +65,18 @@ function computeLayout(){const L=SAFE.l,R=VW-SAFE.r,T0=SAFE.t,B=VH-SAFE.b,aw=R-L
  if(portrait){const a=CL(Math.floor(Math.min(aw/7,ah*.085)),56,70),br=CL(Math.round(a*.62),34,42),ph=3*a+46;
   const py=B-6-ph;o.panel=[{x:L+6,y:py,w:aw-12,h:ph}];
   o.field={x:L,y:T0+56,w:aw,h:py-6-(T0+56)};
-  const cy=py+ph/2+4;o.pad={cx:L+6+14+1.5*a,cy,a};
-  const ax=R-6-14-br,gap=Math.max(14,Math.min(30,ax-br-(o.pad.cx+1.5*a)-2*br-24));const bx=ax-2*br-gap;
-  o.ab={b:{cx:bx,cy:cy+br*.38,r:br},a:{cx:ax,cy:cy-br*.38,r:br}}}
+  // Oct 30 (Peter): JUMP (A) bottom-right, ACTION (B) bottom-left, mirrored; swipe hint centered
+  const cy=py+ph/2+4;o.pad={cx:(L+R)/2,cy,a};
+  const ax=R-6-14-br,bx=L+6+14+br;
+  o.ab={b:{cx:bx,cy:cy+br*.38,r:br},a:{cx:ax,cy:cy+br*.38,r:br}}}
  else{const a=CL(Math.floor(ah*.15),56,66),br=CL(Math.round(a*.6),34,40),side=Math.max(3*a+28,4*br+40);
   const fx=L+side,fw=aw-2*side;o.field={x:fx,y:T0+56,w:fw,h:B-6-(T0+56)};
-  const cy=B-14-1.5*a;o.pad={cx:L+side/2,cy,a};const rx0=fx+fw,rc=rx0+side/2;
-  o.ab={b:{cx:rc-br-6,cy:B-30-br,r:br},a:{cx:rc+br+6,cy:B-30-br-br*.8,r:br}};
-  o.panel=[{x:L+4,y:cy-1.5*a-12,w:side-8,h:B-4-(cy-1.5*a-12)},{x:rx0+4,y:o.ab.a.cy-br-40,w:side-8,h:B-4-(o.ab.a.cy-br-40)}]}
- const P=o.pad,bb=q=>({x:q.cx-q.r,y:q.cy-q.r,w:2*q.r,h:2*q.r});o.btn={pad:{x:P.cx-1.5*P.a,y:P.cy-1.5*P.a,w:3*P.a,h:3*P.a},b:bb(o.ab.b),a:bb(o.ab.a)};
+  // Oct 30 (Peter): JUMP (A) bottom-right, ACTION (B) bottom-left, mirrored; swipe hint above ACTION
+  const rx0=fx+fw,rc=rx0+side/2,by=B-30-br;
+  o.ab={b:{cx:L+side/2,cy:by,r:br},a:{cx:rc,cy:by,r:br}};const cy=by-br-34-34;o.pad={cx:L+side/2,cy,a};
+  const pty=Math.min(cy-34,by-br-40);
+  o.panel=[{x:L+4,y:pty,w:side-8,h:B-4-pty},{x:rx0+4,y:pty,w:side-8,h:B-4-pty}]}
+ const P=o.pad,bb=q=>({x:q.cx-q.r,y:q.cy-q.r,w:2*q.r,h:2*q.r});o.btn={pad:{x:P.cx-1.5*P.a,y:P.cy-26,w:3*P.a,h:52},b:bb(o.ab.b),a:bb(o.ab.a)};
  return o}
 addEventListener('resize',onResize);
 // ---------- audio (soft, tense ambient; Web Audio only) ----------
@@ -943,7 +946,7 @@ function tri(x,y,s,ang,col){g.save();g.translate(x,y);g.rotate(ang);g.beginPath(
 const CTXL={take:['✊','TAKEDOWN'],fight:['✊','ATTACK'],grab:['✋','GRAB'],throw:['🥥','THROW'],door:['🚪','OPEN'],locked:['🔑','UNLOCK'],cage:['🔓','FREE KIDS'],ladder:['🪜','CLIMB']};
 function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
  for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
- if(L.portrait){const pn=L.panel[0],x0=P.cx+1.5*a+10,x1=pn.x+pn.w-12;const s="PETE'S ISLAND";txt(s,(x0+x1)/2,pn.y+24,fitSize(s,16,x1-x0),'#ff6a5a','center',{f:'"Courier New",monospace'})}
+ if(L.portrait){const pn=L.panel[0],x0=L.ab.b.cx-L.ab.b.r,x1=L.ab.a.cx+L.ab.a.r;const s="PETE'S ISLAND";txt(s,(x0+x1)/2,pn.y+24,fitSize(s,16,x1-x0),'#ff6a5a','center',{f:'"Courier New",monospace'})}
  {const sw=a*3-8,l1='SWIPE ANYWHERE',l2='TO MOVE';txt(l1,cx,cy-12,fitSize(l1,16,sw),'#8f8c99','center',{f:'"Courier New",monospace'});txt(l2,cx,cy+12,fitSize(l2,16,sw),'#8f8c99','center',{f:'"Courier New",monospace'})}
  const ctx=state==='play'&&G&&G.mode!=='fight'?G.ctx:null;const side=G&&(G.mode==='side'||G.mode==='fight');
  for(const k of ['b','a']){const q=L.ab[k],on=held[k];const dy=on?2:0;g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
@@ -953,7 +956,7 @@ function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
   txt(k==='a'?(side||!G?'JUMP':'HOP'):'ACTION',q.cx,q.cy+q.r+14,16,'#cfcad8','center')}
  // context icon above B
  const q=L.ab.b;let c2=ctx?CTXL[ctx.k]:G&&G.mode==='fight'?['✊',held.d?'LOW KICK':'PUNCH']:null;
- if(c2){const s=c2[0]+' '+c2[1];g.font=font(16);const w=g.measureText(s).width+14;let x=q.cx+q.r*.4-w;const panel=L.panel[L.portrait?0:1];x=CL(x,panel.x+10,panel.x+panel.w-10-w);const y=q.cy-q.r-34;rr(x,y,w,28,10,ctx&&(ctx.k==='take'||ctx.k==='fight')?'#a0102a':'#1f6f3f','#fff',2);txt(s,x+w/2,y+14,16,'#fff')}}
+ if(c2){const s=c2[0]+' '+c2[1];g.font=font(16);const w=g.measureText(s).width+14;let x=q.cx+q.r*.4-w;const panel=L.panel[0];x=CL(x,panel.x+10,panel.x+panel.w-10-w);const y=q.cy-q.r-34;rr(x,y,w,28,10,ctx&&(ctx.k==='take'||ctx.k==='fight')?'#a0102a':'#1f6f3f','#fff',2);txt(s,x+w/2,y+14,16,'#fff')}}
 
 // ===== screens & menus =====
 let BTNDOWN=null,howPage=0,sel=0,IMG={};
