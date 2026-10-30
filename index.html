@@ -139,6 +139,8 @@ function shirtFill(K,x,y,w,h,face){
  else if(K.shirt==='hawaii'){g.fillStyle='#f07a1e';g.fillRect(x,y,w,h);g.fillStyle='#2f7d3a';for(let i=0;i<5;i++){const px=x+((i*3.7)%w),py=y+((i*5.3)%h);g.beginPath();for(let k=0;k<5;k++){const a=-PI/2+(k-2)*.6;g.moveTo(px,py);g.quadraticCurveTo(px+Math.cos(a)*1.6,py+Math.sin(a)*1.6-0.6,px+Math.cos(a)*2.4,py+Math.sin(a)*2.4)}g.lineWidth=.6;g.strokeStyle='#2f7d3a';g.stroke();g.fillStyle='#7a4a24';g.fillRect(px-.25,py,.5,2.4)}g.fillStyle='rgba(255,220,120,.35)';g.fillRect(x,y,w,1)}
  else{const gr=g.createLinearGradient(x,0,x+w,0);gr.addColorStop(0,face>0?K.shirtD||K.shirt:K.shirt);gr.addColorStop(1,face>0?K.shirt:K.shirtD||K.shirt);g.fillStyle=gr;g.fillRect(x,y,w,h)}}
 // pose: idle|walk|crouch|jump|punch|kick|lowkick|climb|hurt|ko|cheer|scared|thumbs|block|windup
+/* leg rig (Grey Heart leg check, Oct 2026): stride phase follows distance actually moved, amplitude eases in/out so legs settle to standing */
+function GT(o,x,y,mv,k){const now=performance.now()/1000,dt=Math.min(.1,Math.max(0,now-(o._gt||now)));o._gt=now;let d=o._gx===undefined?0:Math.hypot(x-o._gx,y-o._gy);o._gx=x;o._gy=y;if(d>24)d=0;o._gp=(o._gp||0)+d*k;const m=mv&&d>.01;o._ga=(o._ga||0)+((m?1:0)-(o._ga||0))*Math.min(1,dt*(m?12:8));if(o._ga<.03&&!m){o._ga=0;o._gp=Math.round(o._gp/PI)*PI}return [o._gp,o._ga]}
 function drawMan(kind,x,y,s,face,pose,ph,o){o=o||{};const K=KIND[kind];const h=K.h,W=K.w;g.save();g.translate(x,y);g.scale(s*face,s);
  if(o.flash&&Math.floor(o.flash*20)%2)g.globalAlpha=.45;
  if(pose==='ko'){g.rotate(-PI/2*0.92);g.translate(0,-2)}
@@ -146,7 +148,7 @@ function drawMan(kind,x,y,s,face,pose,ph,o){o=o||{};const K=KIND[kind];const h=K
  if(pose!=='ko'&&!o.noShadow){g.fillStyle='rgba(0,0,0,.28)';g.beginPath();g.ellipse(0,0,7*W,1.6,0,0,TAU);g.fill()}
  let hip=h*.47,sh=h*.79,lean=0,la=0,lb=0,lk1=.15,lk2=.15,aF=.25,aB=-.2,eF=-.3,eB=-.3;
  const sw=Math.sin(ph||0);
- if(pose==='walk'){la=sw*.55;lb=-sw*.55;lk1=lk2=.25;aF=-sw*.5;aB=sw*.5}
+ if(pose==='walk'){const A=o.amp===undefined?1:o.amp;la=sw*.55*A;lb=-sw*.55*A;lk1=.15+(.1+Math.max(0,-Math.cos(ph||0))*.5)*A;lk2=.15+(.1+Math.max(0,Math.cos(ph||0))*.5)*A;aF=-sw*.5*A;aB=sw*.5*A}
  else if(pose==='idle'){const br=Math.sin((ph||0)*.5)*.3;sh+=br*.3}
  else if(pose==='crouch'||pose==='lowkick'){hip=h*.3;sh=h*.6;la=-1.1;lk1=2.0;lb=-.6;lk2=1.6;aF=-1.0;eF=-.9;aB=-.5;lean=.25}
  else if(pose==='jump'){la=-.9;lk1=1.4;lb=-.2;lk2=1.0;aF=-2.4;aB=-2.0;eF=.2}
@@ -159,6 +161,7 @@ function drawMan(kind,x,y,s,face,pose,ph,o){o=o||{};const K=KIND[kind];const h=K
  else if(pose==='cheer'){const j=Math.abs(Math.sin((ph||0)*1.5));g.translate(0,-j*3);aF=PI-.35;aB=PI+.35-.1;eF=eB=.2}
  else if(pose==='scared'){const sk=Math.sin((ph||0)*9)*.4;g.translate(sk,0);aF=-2.5;eF=-2.2;aB=-2.3;eB=-2.2;la=.1;lb=-.1}
  else if(pose==='thumbs'){aF=-2.3;eF=.4;aB=.2}
+ if(pose==='crouch'&&o.amp){la+=sw*.6*o.amp;lb-=sw*.6*o.amp;lk1+=Math.max(0,-Math.cos(ph||0))*.5*o.amp;lk2+=Math.max(0,Math.cos(ph||0))*.5*o.amp}
  if(pose==='lowkick'){la=-1.55;lk1=0;lb=.2;lk2=1.9}
  const legL=hip/2,legW=3.1*W*(K.kid?.85:1);
  const pc=K.pants==='stars'?'#1d2c5e':K.pants;
@@ -236,7 +239,7 @@ function parrot(x,y,ph){g.save();g.translate(x,y);const b=Math.sin((ph||0)*2)*.4
 function drawTop(kind,x,y,s,a,ph,o){o=o||{};const K=KIND[kind];const k=K.kid?.7:kind==='pete'?1.15:1;g.save();g.translate(x,y);g.scale(s*k,s*k);
  if(o.ko){g.globalAlpha=.95}
  g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(1.2,1.6,6.5,5,0,0,TAU);g.fill();
- g.rotate(a);const sw=Math.sin(ph||0)*(o.moving?2.2:0);
+ g.rotate(a);const sw=Math.sin(ph||0)*2.2*(o.amp!==undefined?o.amp:(o.moving?1:0));
  if(o.ko){g.rotate(PI/2)}
  // feet
  g.fillStyle=K.shoe==='flag'?'#c8202f':K.shoe;g.beginPath();g.ellipse(sw,-2.3,2,1.3,0,0,TAU);g.fill();g.beginPath();g.ellipse(-sw,2.3,2,1.3,0,0,TAU);g.fill();
@@ -839,11 +842,11 @@ function drawTopView(F){const S=G.S,H=G.H,t=G.t;const vt=LY.portrait?11:13,ws=Ma
  // thrown items in flight
  for(const p of G.proj){if(p.fx)continue;const k=Math.min(1,p.t);const x=LERP(p.x0,p.x1,k),y=LERP(p.y0,p.y1,k)-Math.sin(k*PI)*18;const [sx,sy]=W2S(x,y);g.fillStyle=p.k==='c'?'#6a4524':'#999';g.beginPath();g.arc(sx,sy,T*ws*.2,0,TAU);g.fill();if(p.t>=1){const [rx,ry]=W2S(p.x1,p.y1);g.strokeStyle='rgba(255,255,255,'+(1.6-p.t)+')';g.lineWidth=2;g.beginPath();g.arc(rx,ry,(p.t-1)*T*ws*6,0,TAU);g.stroke()}}
  // guards
- for(const gd of S.guards){const [sx,sy]=W2S(gd.x,gd.y);if(gd.st==='ko'){drawTop('thug',sx,sy,ws,gd.a,gd.ph,{ko:1,dizzy:1});continue}drawTop('thug',sx,sy,ws,gd.a,gd.ph,{moving:gd.moving})}
+ for(const gd of S.guards){const [sx,sy]=W2S(gd.x,gd.y);if(gd.st==='ko'){drawTop('thug',sx,sy,ws,gd.a,gd.ph,{ko:1,dizzy:1});continue}{const GD=GT(gd,gd.x,gd.y,gd.moving,.2);drawTop('thug',sx,sy,ws,gd.a,GD[0],{amp:GD[1]})}}
  // kids + hero
- G.kidsPos.forEach(k=>{const [sx,sy]=W2S(k.x,k.y);drawTop(k.k,sx,sy,ws,k.a||PI/2,k.ph,{moving:k.moving})});
+ G.kidsPos.forEach(k=>{const [sx,sy]=W2S(k.x,k.y);{const GK=GT(k,k.x,k.y,k.moving,.26);drawTop(k.k,sx,sy,ws,k.a||PI/2,GK[0],{amp:GK[1]})}});
  const [hx,hy]=W2S(H.x,H.y);const hid=heroVisTop(S,H)===0;const z=(H.z||0)*ws;if(z){g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(hx,hy+4,6*ws,4*ws,0,0,TAU);g.fill()}
- g.globalAlpha=hid?.55:1;drawTop('hero',hx,hy-z,ws,H.a,H.ph,{moving:H.moving});g.globalAlpha=1;
+ g.globalAlpha=hid?.55:1;{const GH=GT(H,H.x,H.y,H.moving&&!H.hop,.2);drawTop('hero',hx,hy-z,ws,H.a,GH[0],{amp:GH[1]})}g.globalAlpha=1;
  if(H.hold){const [ix,iy]=[hx+Math.cos(H.a)*8*ws,hy-z+Math.sin(H.a)*8*ws];g.fillStyle=H.hold==='c'?'#6a4524':'#999';g.beginPath();g.arc(ix,iy,T*ws*.18,0,TAU);g.fill()}
  // palm crowns (over everything on the ground)
  for(const p of S.palms){const [sx,sy]=W2S(p.x,p.y);const r=T*ws*1.25,sw=Math.sin(t*1.2+p.r)*.05;g.save();g.translate(sx-4,sy-6);g.rotate(sw);for(let i=0;i<9;i++){const a=i*TAU/9+p.r;g.fillStyle=i%2?'#2f6e2c':'#3f8a36';g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(Math.cos(a-.25)*r*.7,Math.sin(a-.25)*r*.7,Math.cos(a)*r,Math.sin(a)*r);g.quadraticCurveTo(Math.cos(a+.25)*r*.7,Math.sin(a+.25)*r*.7,0,0);g.fill();g.strokeStyle='rgba(20,50,20,.6)';g.lineWidth=1;g.beginPath();g.moveTo(0,0);g.lineTo(Math.cos(a)*r*.95,Math.sin(a)*r*.95);g.stroke()}g.fillStyle='#6b4a2a';g.beginPath();g.arc(0,0,4,0,TAU);g.fill();g.restore()}
@@ -895,14 +898,14 @@ function drawSideView(F){const S=G.S,H=G.H,t=G.t;const ws=Math.min(F.w/(8.5*T),F
  // thugs + their flashlight cones
  const cones=[];for(const th of S.thugs){if(th.st==='ko')continue;const ex=th.x+th.face*3,ey=th.y-22;cones.push(conePoly(S,ex,ey,th.face>0?0:PI,100,.42,(x,y)=>sSolid(sT(S,Math.floor(x/T),Math.floor(y/T)))))}
  cones.forEach((p,i)=>fillPoly(p,W2S,'rgba(255,240,170,.16)'));
- for(const th of S.thugs){const [sx,sy]=W2S(th.x,th.y);if(th.st==='ko')drawMan('thug',sx,sy,ws,th.face,'ko',th.ph,{dizzy:1,noLight:1});else drawMan('thug',sx,sy,ws,th.face,th.moving?'walk':'idle',th.ph)}
+ for(const th of S.thugs){const [sx,sy]=W2S(th.x,th.y);if(th.st==='ko')drawMan('thug',sx,sy,ws,th.face,'ko',th.ph,{dizzy:1,noLight:1});else{const GQ=GT(th,th.x,th.y,th.moving,.125);drawMan('thug',sx,sy,ws,th.face,(th.moving||GQ[1]>.05)?'walk':'idle',(th.moving||GQ[1]>.05)?GQ[0]:th.ph,{amp:GQ[1]})}}
  // runners (freed kids heading to the boat)
- for(const r of G.runners){const [sx,sy]=W2S(r.x,r.y);g.globalAlpha=Math.max(0,1-r.t/4);drawMan(r.k,sx,sy,ws*.95,r.dir,'walk',r.ph*1.3);g.globalAlpha=1}
- G.kidsPos.forEach((k,i)=>{const [sx,sy]=W2S(k.x,k.y);drawMan(k.k,sx,sy,ws*.95,k.face||1,k.cheer>0?'cheer':k.moving?'walk':'idle',k.ph)});
+ for(const r of G.runners){const [sx,sy]=W2S(r.x,r.y);g.globalAlpha=Math.max(0,1-r.t/4);{const GR=GT(r,r.x,r.y,true,.16);drawMan(r.k,sx,sy,ws*.95,r.dir,'walk',GR[0],{amp:GR[1]})}g.globalAlpha=1}
+ G.kidsPos.forEach((k,i)=>{const [sx,sy]=W2S(k.x,k.y);const GK=GT(k,k.x,k.y,k.moving,.16);drawMan(k.k,sx,sy,ws*.95,k.face||1,k.cheer>0?'cheer':(k.moving||GK[1]>.05)?'walk':'idle',k.cheer>0||!(k.moving||GK[1]>.05)?k.ph:GK[0],{amp:GK[1]})});
  // jump cue (villa): stairs top '/' with a ledge '=' to its left -> '◀ JUMP' hint near the hero
  for(let y=0;y<S.h;y++)for(let x=1;x<S.w;x++)if(S.t[y][x]==='/'&&S.t[y][x-1]==='='&&Math.abs(H.x-(x+.5)*T)<T*4&&Math.abs(H.y-y*T)<T*3){const tt=performance.now()/1000,[ax,ay]=W2S((x-.7)*T,(y-2.35)*T);/* above the wardrobe */g.save();g.font='bold '+Math.round(Math.max(18,7*ws))+'px sans-serif';g.textAlign='center';g.textBaseline='middle';g.lineWidth=4;g.strokeStyle='rgba(0,0,0,.85)';g.fillStyle='#ffe14a';g.globalAlpha=.8+.2*Math.sin(tt*7);const bx2=ax-Math.abs(Math.sin(tt*4))*6;g.strokeText('◀ JUMP',bx2,ay);g.fillText('◀ JUMP',bx2,ay);g.restore()}
  // hero
- const [hx,hy]=W2S(H.x,H.y);const hid=sideHidden(S,H);let pose=H.climb?'climb':!H.ground?'jump':H.crouch?'crouch':H.moving?'walk':'idle';g.globalAlpha=hid?.6:1;drawMan('hero',hx,hy,ws,H.face,pose,H.climb?(H.moving?H.ph:0):H.ph);g.globalAlpha=1;
+ const [hx,hy]=W2S(H.x,H.y);const hid=sideHidden(S,H);const GH=GT(H,H.x,H.y,H.moving&&H.ground&&!H.climb,H.crouch?.22:.125);let pose=H.climb?'climb':!H.ground?'jump':H.crouch?'crouch':(H.moving||GH[1]>.05)?'walk':'idle';g.globalAlpha=hid?.6:1;drawMan('hero',hx,hy,ws,H.face,pose,H.climb?(H.moving?H.ph:0):(pose==='idle'?H.ph:GH[0]),{amp:GH[1]});g.globalAlpha=1;
  // front objects (hide spots)
  for(let y=0;y<S.h;y++)for(let x=0;x<S.w;x++)if(S.t[y][x]==='f'){const [sx,sy]=W2S(x*T,y*T);frontObj(S,x,y,ws,sx,sy,Math.abs(H.x-(x+.5)*T)<16)}
  // lighting
@@ -917,10 +920,10 @@ function drawFight(F){const FT=G.fight,H=FT.H,t=G.t;const ws=Math.min(F.w/AW,F.h
  fightBG(F,FT.theme,floorY);
  for(const p of G.proj){if(!p.fx)continue;const [sx,sy]=W2S(p.x,p.y);g.fillStyle='#6a4524';g.beginPath();g.arc(sx,sy,4*ws,0,TAU);g.fill()}
  for(const e of FT.en){const [sx,sy]=W2S(e.x,e.y);let pose=e.st==='down'?(e.run?'walk':'ko'):e.st==='windup'?'windup':e.st==='strike'||e.st==='lunge'?'punch':e.st==='block'?'block':e.st==='stun'?'hurt':e.st==='approach'||e.st==='back'?'walk':'idle';
-  const face=e.run?1:e.face;drawMan(e.kind,sx,sy,ws,face,pose,e.ph,{flash:e.flash,dizzy:e.st==='down'&&!e.run,noLight:1});
+  const face=e.run?1:e.face,GE=GT(e,e.x,0,pose==='walk',.125);drawMan(e.kind,sx,sy,ws,face,pose,pose==='walk'?GE[0]:e.ph,{amp:pose==='walk'?Math.max(GE[1],.25):1,flash:e.flash,dizzy:e.st==='down'&&!e.run,noLight:1});
   if(e.st==='windup'&&!e.toss){txt('!',sx,sy-34*ws,22,'#ff3b3b','center',{f:TFONT,stroke:4})}}
  const hp=H.atk?(H.atk.k==='punch'?(H.atk.t<.07?'windup':'punch'):H.atk.k==='low'?'lowkick':'kick'):!H.ground?'jump':H.crouch?'crouch':H.flash>.4?'hurt':Math.abs(H.vx)>1?'walk':'idle';
- const [hx,hy]=W2S(H.x,H.y);drawMan('hero',hx,hy,ws,H.face,hp,H.ph,{flash:H.flash});
+ const [hx,hy]=W2S(H.x,H.y),GF=GT(H,H.x,0,hp==='walk',.125);drawMan('hero',hx,hy,ws,H.face,hp,hp==='walk'?GF[0]:H.ph,{amp:hp==='walk'?Math.max(GF[1],.25):1,flash:H.flash});
  drawPops(W2S,ws);
  // health bars
  const bw=Math.min(150,F.w*.4),by=F.y+40;rr(F.x+10,by,bw,20,6,'rgba(0,0,0,.6)','#fff',2);rr(F.x+12,by+2,(bw-4)*G.hp/100,16,5,G.hp>35?'#3bd16f':'#ff6a5a');txt('STARS & STRIPES',F.x+10,by+32,16,'#fff','left',{stroke:3});
