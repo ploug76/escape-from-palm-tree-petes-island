@@ -65,16 +65,15 @@ function computeLayout(){const L=SAFE.l,R=VW-SAFE.r,T0=SAFE.t,B=VH-SAFE.b,aw=R-L
  if(portrait){const a=CL(Math.floor(Math.min(aw/7,ah*.085)),56,70),br=CL(Math.round(a*.62),34,42),ph=3*a+46;
   const py=B-6-ph;o.panel=[{x:L+6,y:py,w:aw-12,h:ph}];
   o.field={x:L,y:T0+56,w:aw,h:py-6-(T0+56)};
-  // Oct 30 (Peter): JUMP (A) bottom-right, ACTION (B) bottom-left, mirrored; swipe hint centered
-  const cy=py+ph/2+4;o.pad={cx:(L+R)/2,cy,a};
-  const ax=R-6-14-br,bx=L+6+14+br;
-  o.ab={b:{cx:bx,cy:cy+br*.38,r:br},a:{cx:ax,cy:cy+br*.38,r:br}}}
+  // Peter Oct 30 9:40 PM: cluster like his screenshot - JUMP big orange far bottom-right, ACTION smaller green up-left of it; swipe hint on the left
+  const ra=CL(Math.round(aw*0.13),46,62),rb=Math.round(ra*0.84),ax=R-6-12-ra,ay=B-6-14-ra,bx=ax-ra-14-rb,by=Math.max(py+78+rb,ay-ra*0.84);
+  o.ab={b:{cx:bx,cy:by,r:rb},a:{cx:ax,cy:ay,r:ra}};o.pad={cx:(L+6+bx-rb)/2,cy:py+ph/2+4,a}}
  else{const a=CL(Math.floor(ah*.15),56,66),br=CL(Math.round(a*.6),34,40),side=Math.max(3*a+28,4*br+40);
   const fx=L+side,fw=aw-2*side;o.field={x:fx,y:T0+56,w:fw,h:B-6-(T0+56)};
-  // Oct 30 (Peter): JUMP (A) bottom-right, ACTION (B) bottom-left, mirrored; swipe hint above ACTION
-  const rx0=fx+fw,rc=rx0+side/2,by=B-30-br;
-  o.ab={b:{cx:L+side/2,cy:by,r:br},a:{cx:rc,cy:by,r:br}};const cy=by-br-34-34;o.pad={cx:L+side/2,cy,a};
-  const pty=Math.min(cy-34,by-br-40);
+  // Peter Oct 30 9:40 PM: cluster in the right panel - JUMP big orange bottom-right, ACTION smaller green up-left of it; swipe hint in the left panel
+  const rx0=fx+fw,big=CL(Math.round(ah*0.21),72,96),ra=Math.min(Math.round(big/2),Math.floor((side-30)/3.64)),rb=Math.round(ra*0.82),ax=R-4-10-ra,ay=B-4-12-ra,bx=Math.max(rx0+14+rb,ax-ra-10-rb),by=B-4-12-2*ra*0.18-rb;
+  o.ab={b:{cx:bx,cy:by,r:rb},a:{cx:ax,cy:ay,r:ra}};const cy=B-14-1.5*a;o.pad={cx:L+side/2,cy,a};
+  const pty=Math.min(cy-1.5*a-12,by-rb-40);
   o.panel=[{x:L+4,y:pty,w:side-8,h:B-4-pty},{x:rx0+4,y:pty,w:side-8,h:B-4-pty}]}
  const P=o.pad,bb=q=>({x:q.cx-q.r,y:q.cy-q.r,w:2*q.r,h:2*q.r});o.btn={pad:{x:P.cx-1.5*P.a,y:P.cy-26,w:3*P.a,h:52},b:bb(o.ab.b),a:bb(o.ab.a)};
  return o}
@@ -946,17 +945,16 @@ function tri(x,y,s,ang,col){g.save();g.translate(x,y);g.rotate(ang);g.beginPath(
 const CTXL={take:['✊','TAKEDOWN'],fight:['✊','ATTACK'],grab:['✋','GRAB'],throw:['🥥','THROW'],door:['🚪','OPEN'],locked:['🔑','UNLOCK'],cage:['🔓','FREE KIDS'],ladder:['🪜','CLIMB']};
 function drawControls(){const L=LY,P=L.pad,a=P.a,cx=P.cx,cy=P.cy;
  for(const pn of L.panel){rr(pn.x,pn.y,pn.w,pn.h,18,'#b9b6bf','#efeef2',3);rr(pn.x+8,pn.y+8,pn.w-16,pn.h-16,12,'#2b2833',null)}
- if(L.portrait){const pn=L.panel[0],x0=L.ab.b.cx-L.ab.b.r,x1=L.ab.a.cx+L.ab.a.r;const s="PETE'S ISLAND";txt(s,(x0+x1)/2,pn.y+24,fitSize(s,16,x1-x0),'#ff6a5a','center',{f:'"Courier New",monospace'})}
- {const sw=a*3-8,l1='SWIPE ANYWHERE',l2='TO MOVE';txt(l1,cx,cy-12,fitSize(l1,16,sw),'#8f8c99','center',{f:'"Courier New",monospace'});txt(l2,cx,cy+12,fitSize(l2,16,sw),'#8f8c99','center',{f:'"Courier New",monospace'})}
+ if(L.portrait){const pn=L.panel[0],x0=pn.x+12,x1=L.ab.b.cx-L.ab.b.r-6;const s="PETE'S ISLAND";txt(s,(x0+x1)/2,pn.y+24,fitSize(s,16,x1-x0),'#ff6a5a','center',{f:'"Courier New",monospace'})}
+ {const sw=L.portrait?Math.min(a*3-8,2*(L.ab.b.cx-L.ab.b.r-cx)-12):a*3-8,l1='SWIPE ANYWHERE',l2='TO MOVE';txt(l1,cx,cy-12,fitSize(l1,16,sw),'#8f8c99','center',{f:'"Courier New",monospace'});txt(l2,cx,cy+12,fitSize(l2,16,sw),'#8f8c99','center',{f:'"Courier New",monospace'})}
  const ctx=state==='play'&&G&&G.mode!=='fight'?G.ctx:null;const side=G&&(G.mode==='side'||G.mode==='fight');
  for(const k of ['b','a']){const q=L.ab[k],on=held[k];const dy=on?2:0;g.beginPath();g.arc(q.cx,q.cy+3,q.r,0,TAU);g.fillStyle='#000';g.fill();
-  g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);g.fillStyle=on?'#ff6a5a':'#d1302f';g.fill();g.lineWidth=3;g.strokeStyle=on?'#ffd84a':'#7c1515';g.stroke();
+  g.beginPath();g.arc(q.cx,q.cy+dy,q.r,0,TAU);{const _g=g.createRadialGradient(q.cx-q.r*.3,q.cy+dy-q.r*.4,q.r*.1,q.cx,q.cy+dy,q.r);if(k==='a'){_g.addColorStop(0,'#ffe0b0');_g.addColorStop(.55,'#ff8a1a');_g.addColorStop(1,'#a03a00')}else{_g.addColorStop(0,'#d8ffd0');_g.addColorStop(.55,'#38b040');_g.addColorStop(1,'#0a5a12')}g.fillStyle=_g};g.fill();g.lineWidth=3;g.strokeStyle='#fff';g.stroke();if(on){g.fillStyle='rgba(255,255,255,.22)';g.fill()}
   g.beginPath();g.arc(q.cx-q.r*.3,q.cy+dy-q.r*.35,q.r*.28,0,TAU);g.fillStyle='rgba(255,255,255,.28)';g.fill();
-  txt(k.toUpperCase(),q.cx,q.cy+dy+1,Math.round(q.r*.75),'#fff','center',{stroke:3,sc:'rgba(0,0,0,.45)'});
-  txt(k==='a'?(side||!G?'JUMP':'HOP'):'ACTION',q.cx,q.cy+q.r+14,16,'#cfcad8','center')}
+  {const s=k==='a'?(side||!G?'JUMP':'HOP'):'ACTION';g.font='900 '+(Math.round(q.r*(k==='a'?.52:.4)))+'px '+'"Arial Black",Impact,system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';g.lineWidth=Math.max(3,(Math.round(q.r*(k==='a'?.52:.4)))*0.22);g.strokeStyle='#000';g.strokeText(s,q.cx,q.cy+dy+1);g.fillStyle='#fff';g.fillText(s,q.cx,q.cy+dy+1)}}
  // context icon above B
  const q=L.ab.b;let c2=ctx?CTXL[ctx.k]:G&&G.mode==='fight'?['✊',held.d?'LOW KICK':'PUNCH']:null;
- if(c2){const s=c2[0]+' '+c2[1];g.font=font(16);const w=g.measureText(s).width+14;let x=q.cx+q.r*.4-w;const panel=L.panel[0];x=CL(x,panel.x+10,panel.x+panel.w-10-w);const y=q.cy-q.r-34;rr(x,y,w,28,10,ctx&&(ctx.k==='take'||ctx.k==='fight')?'#a0102a':'#1f6f3f','#fff',2);txt(s,x+w/2,y+14,16,'#fff')}}
+ if(c2){const s=c2[0]+' '+c2[1];g.font=font(16);const w=g.measureText(s).width+14;let x=q.cx+q.r*.4-w;const panel=L.panel[L.portrait?0:1];x=CL(x,panel.x+10,panel.x+panel.w-10-w);const y=q.cy-q.r-34;rr(x,y,w,28,10,ctx&&(ctx.k==='take'||ctx.k==='fight')?'#a0102a':'#1f6f3f','#fff',2);txt(s,x+w/2,y+14,16,'#fff')}}
 
 // ===== screens & menus =====
 let BTNDOWN=null,howPage=0,sel=0,IMG={};
@@ -1071,7 +1069,7 @@ let keys={l:0,r:0,u:0,d:0,a:0,b:0},ptrs=new Map();
 const inR=(b,x,y,p=0)=>x>=b.x-p&&x<=b.x+b.w+p&&y>=b.y-p&&y<=b.y+b.h+p;
 function padDirs(x,y){const P=LY.pad,dx=x-P.cx,dy=y-P.cy,ax=Math.abs(dx),ay=Math.abs(dy),o=[];if(Math.hypot(dx,dy)<P.a*.3)return o;const Tn=2.414;if(ax>ay/Tn)o.push(dx>0?'r':'l');if(ay>ax/Tn)o.push(dy>0?'d':'u');return o}
 function swDirs(q,x,y){const dx=x-q.sx,dy=y-q.sy,d=Math.hypot(dx,dy),M=56;if(d>M){q.sx=x-dx*M/d;q.sy=y-dy*M/d}if(d<16)return q.pad;const ax=Math.abs(dx),ay=Math.abs(dy),o=[],Tn=2.414;if(ax>ay/Tn)o.push(dx>0?'r':'l');if(ay>ax/Tn)o.push(dy>0?'d':'u');return o}
-function abAt(x,y,pad=12){const o=[];for(const k of ['b','a']){const q=LY.ab[k];if(Math.hypot(x-q.cx,y-q.cy)<=q.r+pad)o.push(k)}return o}
+function abAt(x,y,pad=12){let bk=null,bd=1e9;for(const k of ['b','a']){const q=LY.ab[k],d=Math.hypot(x-q.cx,y-q.cy);if(d<=Math.max(q.r+pad,q.r*1.6)&&d/q.r<bd){bd=d/q.r;bk=k}}return bk?[bk]:[]}
 function inPanel(x,y){return LY.panel.some(p=>inR(p,x,y,0))}
 function recompute(){const h={l:0,r:0,u:0,d:0,a:0,b:0};for(const q of ptrs.values()){if(q.pad)for(const k of q.pad)h[k]=1;if(q.ab)for(const k of q.ab)h[k]=1}
  for(const k in h)h[k]=h[k]||keys[k];for(const k of ['l','r','u','d','a','b'])if(h[k]&&!held[k])vib(8);held=h}
