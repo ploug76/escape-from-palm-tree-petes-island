@@ -65,13 +65,13 @@ function computeLayout(){const L=SAFE.l,R=VW-SAFE.r,T0=SAFE.t,B=VH-SAFE.b,aw=R-L
  if(portrait){const a=CL(Math.floor(Math.min(aw/7,ah*.085)),56,70),br=CL(Math.round(a*.62),34,42),ph=3*a+46;
   const py=B-6-ph;o.panel=[{x:L+6,y:py,w:aw-12,h:ph}];
   o.field={x:L,y:T0+56,w:aw,h:py-6-(T0+56)};
-  // Peter Oct 30 9:40 PM: cluster like his screenshot - JUMP big orange far bottom-right, ACTION smaller green up-left of it; swipe hint on the left
-  const ra=CL(Math.round(aw*0.13),46,62),rb=Math.round(ra*0.84),ax=R-6-12-ra,ay=B-6-14-ra,bx=ax-ra-14-rb,by=Math.max(py+78+rb,ay-ra*0.84);
+  // Peter Oct 31 9:10 PM: NES pad - ACTION (green) left, JUMP (orange) right, level, both the old ACTION size; swipe hint on the left
+  const ra0=CL(Math.round(aw*0.13),46,62),rb=Math.round(ra0*0.84),ra=rb,ax=R-6-12-ra,ay=Math.max(py+78+rb,B-6-14-ra),bx=ax-ra-18-rb,by=ay;
   o.ab={b:{cx:bx,cy:by,r:rb},a:{cx:ax,cy:ay,r:ra}};o.pad={cx:(L+6+bx-rb)/2,cy:py+ph/2+4,a}}
  else{const a=CL(Math.floor(ah*.15),56,66),br=CL(Math.round(a*.6),34,40),side=Math.max(3*a+28,4*br+40);
   const fx=L+side,fw=aw-2*side;o.field={x:fx,y:T0+56,w:fw,h:B-6-(T0+56)};
-  // Peter Oct 30 9:40 PM: cluster in the right panel - JUMP big orange bottom-right, ACTION smaller green up-left of it; swipe hint in the left panel
-  const rx0=fx+fw,big=CL(Math.round(ah*0.21),72,96),ra=Math.min(Math.round(big/2),Math.floor((side-30)/3.64)),rb=Math.round(ra*0.82),ax=R-4-10-ra,ay=B-4-12-ra,bx=Math.max(rx0+14+rb,ax-ra-10-rb),by=B-4-12-2*ra*0.18-rb;
+  // Peter Oct 31 9:10 PM: NES pad in the right panel - ACTION (green) left, JUMP (orange) right, level, both the old ACTION size; swipe hint in the left panel
+  const rx0=fx+fw,big=CL(Math.round(ah*0.21),72,96),ra0=Math.min(Math.round(big/2),Math.floor((side-30)/3.64)),rb=Math.min(Math.round(ra0*0.82),Math.floor((side-42)/4)),ra=rb,ax=R-4-10-ra,ay=B-4-12-ra,bx=ax-ra-14-rb,by=ay;
   o.ab={b:{cx:bx,cy:by,r:rb},a:{cx:ax,cy:ay,r:ra}};const cy=B-14-1.5*a;o.pad={cx:L+side/2,cy,a};
   const pty=Math.min(cy-1.5*a-12,by-rb-40);
   o.panel=[{x:L+4,y:pty,w:side-8,h:B-4-pty},{x:rx0+4,y:pty,w:side-8,h:B-4-pty}]}
